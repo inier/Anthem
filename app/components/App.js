@@ -3,11 +3,13 @@ import styled from 'styled-components';
 import BaseCom from './BaseComponent';
 import Title from './titile/index';
 import Content from './content/index';
-
+import { hot } from 'react-hot-loader/root';
 const ContainerApp = styled.div `
     max-width: 1024px;
-    margin: 0 auto;
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
 `;
 
 class App extends BaseCom {
@@ -21,4 +23,4 @@ class App extends BaseCom {
   }
 }
 
-export default App;
+export default hot(App);

@@ -1,26 +1,23 @@
-import immutable from 'immutable';
-import {
-  screen
-} from '../defaultData';
+import immutable from "immutable";
+import { screen } from "../defaultData";
 
 module.exports = (state = immutable.fromJS(screen), action) => {
   switch (action.type) {
     /**
      * 增加屏幕
      */
-    case 'ADD_screen':
-      return state.update('allNum', allNum => allNum += 1);
+    case "ADD_screen":
+      return state.update("allNum", (allNum) => (allNum += 1));
 
-      /**
-       * 增加当前加载的屏幕队
-       */
-    case 'ADD_loadingScreen':
-
+    /**
+     * 增加当前加载的屏幕队
+     */
+    case "ADD_loadingScreen":
       //屏幕总数
       let subscript = action.data - 1;
 
       //返回新的显示数组
-      return state.update('loadingScreen', loadingScreenList => {
+      return state.update("loadingScreen", (loadingScreenList) => {
         //最多显示4个屏幕
         for (let i = 0; i < 4; i++) {
           let showScreen = subscript - i;
@@ -33,14 +30,14 @@ module.exports = (state = immutable.fromJS(screen), action) => {
         return loadingScreenList;
       });
 
-    case 'UP_loadingScreen':
-      return state.set('oldNum', action.data);
+    case "UP_loadingScreen":
+      return state.set("oldNum", action.data);
 
-    case 'UP_changeScreen':
-      return state.set('numIng', action.data);
+    case "UP_changeScreen":
+      return state.set("numIng", action.data);
 
-    case 'CHANGE_downChange':
-      return state.update('loadingScreen', list => {
+    case "CHANGE_downChange":
+      return state.update("loadingScreen", (list) => {
         list = list.set(0, action.data - 1);
         list = list.set(1, action.data);
         list = list.set(2, action.data + 1);
@@ -48,8 +45,8 @@ module.exports = (state = immutable.fromJS(screen), action) => {
         return list;
       });
 
-    case 'CHANGE_upChange':
-      return state.update('loadingScreen', list => {
+    case "CHANGE_upChange":
+      return state.update("loadingScreen", (list) => {
         list = list.set(0, action.data - 2);
         list = list.set(1, action.data - 1);
         list = list.set(2, action.data);
@@ -60,4 +57,4 @@ module.exports = (state = immutable.fromJS(screen), action) => {
     default:
       return state;
   }
-}
+};

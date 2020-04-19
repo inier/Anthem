@@ -3,7 +3,7 @@
  */
 export const arrangeProperties = {
   //列数
-  maxColumns: 5,
+  maxColumns: 2,
   //间距(像素)
   spacing: 10,
   //最后一列属性
@@ -15,11 +15,11 @@ export const arrangeProperties = {
   //列宽
   columnsWidth: null,
   //可视区域高度 160为默认值
-  windowViewHeight: 0,
+  viewHeight: 0,
   //left 值
   locationLeft: null,
   //请求图片数量
-  requestImgNum:40
+  requestImgNum:100
 }
 
 /**

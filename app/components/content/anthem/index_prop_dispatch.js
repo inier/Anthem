@@ -1,17 +1,15 @@
 import axios from 'axios';
-import server from '@/serverConf.js';
+import serverConf from '@/serverConf.js';
 import getRobot from './getRobot';
 
-
 /**
- *
  * @param {*} state
  * @param {*} ownProps
  */
 const stateSetProp = (state, ownProps) => {
   return {
     //列数
-    maxcolumns: state.getIn(['arrangeProperties', 'maxColumns']),
+    maxColumns: state.getIn(['arrangeProperties', 'maxColumns']),
     //列宽
     columnsWidth: state.getIn(['arrangeProperties', 'columnsWidth']),
     //屏幕总数
@@ -24,8 +22,8 @@ const stateSetProp = (state, ownProps) => {
     locationLeft: state.getIn(['arrangeProperties', 'locationLeft']),
     //top
     robotTopLocation: state.getIn(['robot', 'robotTopLocation']),
-    //windowHeight
-    windowViewHeight: state.getIn(['arrangeProperties', 'windowViewHeight']),
+    //瀑布流viewHeight
+    viewHeight: state.getIn(['arrangeProperties', 'viewHeight']),
     //当前显示robot
     renderRobot: getRobot(state),
     //请求图片数量
@@ -56,10 +54,10 @@ const dispatchToProps = (dispatch, ownProps) => {
     }),
 
     /**
-     * 获取可视区域高度
+     * 获取瀑布流可视区域高度
      */
-    setWindowHeight: height => dispatch({
-      type: 'SET_windowHeight',
+    setViewHeight: height => dispatch({
+      type: 'SET_viewHeight',
       data: height
     }),
 
@@ -67,19 +65,17 @@ const dispatchToProps = (dispatch, ownProps) => {
      * 添加新图片位置信息
      * imglist 图片
      */
-    addlocationInfo: (imgdata, robotId, screenNumIng) => dispatch({
-      type: 'SET_addlocationInfo',
+    addLocationInfo: (imgData, robotId, screenNumIng) => dispatch({
+      type: 'SET_addLocationInfo',
       data: {
-        imgdata,
+        imgData,
         robotId,
         screenNumIng
       }
     }),
 
-    /**
-     * 获取left值
-     */
-    setlocationLeft: () => dispatch({
+    // 获取left值 
+    setLocationLeft: () => dispatch({
       type: 'SET_locationLeft'
     }),
 
@@ -102,12 +98,12 @@ const dispatchToProps = (dispatch, ownProps) => {
       type: 'ADD_screen'
     }),
 
-    addlocationInfoNum: upNum => dispatch({
+    addLocationInfoNum: upNum => dispatch({
       type: 'ADD_locationInfoNum',
       data: upNum
     }),
 
-    addloadingScreen: screenAllNum => dispatch({
+    addLoadingScreen: screenAllNum => dispatch({
       type: 'ADD_loadingScreen',
       data: screenAllNum
     }),
@@ -140,10 +136,8 @@ const dispatchToProps = (dispatch, ownProps) => {
       data: screenNumIng
     }),
 
-    /**
-     * 获取图片
-     */
-    getNewImgData: requestImgNum => axios.get('http://' + server.imgserver + '/', {
+    // 获取图片
+    getNewImgData: requestImgNum => axios.get(`http://${window.location.hostname}:${serverConf.imgServer.port}/`, {
       params: {
         num: requestImgNum
       }

@@ -13,9 +13,9 @@ module.exports = (state = immutable.fromJS(arrangeProperties), action) => {
      */
     case 'SET_columnsWidth':
       let spacing = state.get('spacing');
-      let maxcolumns = state.get('maxColumns');
+      let maxColumns = state.get('maxColumns');
 
-      return state.set('columnsWidth', Math.floor(((action.data - (spacing * maxcolumns)) / maxcolumns)));
+      return state.set('columnsWidth', Math.floor(((action.data - (spacing * maxColumns)) / maxColumns)));
 
     case 'SET_locationLeft':
       let getspacing = state.get('spacing');
@@ -32,8 +32,8 @@ module.exports = (state = immutable.fromJS(arrangeProperties), action) => {
 
       return state.set('locationLeft', newLeftLocation);
 
-    case 'SET_windowHeight':
-      return state.update('windowViewHeight', defaultHeight => (defaultHeight + action.data));
+    case 'SET_viewHeight':
+      return state.update('viewHeight', defaultHeight => (defaultHeight + action.data));
 
     case 'UP_containerHeight':
       return state.update('containerHeight', currentHeight => (currentHeight < action.data ? action.data : currentHeight));

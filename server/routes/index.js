@@ -1,43 +1,40 @@
-const getImg = require('../module/getImg');
-const router = require('koa-router')();
-const sizeOf = require('image-size');
-const path = require('path');
+const getImg = require("../module/getImg");
+const router = require("koa-router")();
+const sizeOf = require("image-size");
+const path = require("path");
 
-
-const numGetImgList = (imglist, newlist, usergetnum) => {
-
-  if (newlist.length == usergetnum) {
-    return newlist;
+const numGetImgList = (imgList, newList, userGetNum) => {
+  if (newList.length == userGetNum) {
+    return newList;
   }
-  
-  var num = Math.floor(Math.random() * imglist.length);
 
-  let newimg = imglist[num] ? imglist[num] : numGetImgList(imglist, newlist, usergetnum);
+  var num = Math.floor(Math.random() * imgList.length);
+
+  let newImg = imgList[num]
+    ? imgList[num]
+    : numGetImgList(imgList, newList, userGetNum);
   //获取图片宽高
-  let dimensions = sizeOf(path.join(__dirname,'..','public',newimg));
+  let dimensions = sizeOf(path.join(__dirname, "..", "public", newImg));
 
-  newlist.push({
-    src: newimg,
+  newList.push({
+    src: newImg,
     width: dimensions.width,
-    height: dimensions.height
+    height: dimensions.height,
   });
 
-  return numGetImgList(imglist, newlist, usergetnum);
+  return numGetImgList(imgList, newList, userGetNum);
+};
 
-}
-
-
-
-router.get('/', async(ctx, next) => {
+router.get("/", async (ctx, next) => {
   //请求数量
-  let usergetnum = ctx.query.num;
+  let userGetNum = ctx.query.num;
   //所有图片
-  let imglist = await getImg();
+  let imgList = await getImg();
 
   //根据请求数 返回随机图片路径
-  let newlist = numGetImgList(imglist, [], usergetnum);
+  let newList = numGetImgList(imgList, [], userGetNum);
 
-  ctx.body = newlist;
+  ctx.body = newList;
 });
 
-module.exports = router
+module.exports = router;

@@ -36,7 +36,9 @@ node_modules
 
 ## building output directory
 build
-
+server/download
+server/public/download
+server/public/images/download
 # OSX
 .DS_Store
 

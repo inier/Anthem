@@ -3,21 +3,20 @@ import {
   robot
 } from '../defaultData';
 
-
 module.exports = (state = immutable.fromJS(robot), action) => {
   switch (action.type) {
     /**
      * 新增加机器人
      */
-    case 'SET_addlocationInfo':
-      const { robotId, screenNumIng, imgdata, } = action.data;
-      const { src, width, height, left, top, domHeight, domWidth, columnsNum} = imgdata;
+    case 'SET_addLocationInfo':
+      const { robotId, screenNumIng, imgData, } = action.data;
+      const { src, width, height, left, top, domHeight, domWidth, columnsNum} = imgData;
 
       return state.updateIn(['locationInfo', screenNumIng.toString()], list => list.push({
-        robotid: robotId,
+        robotId: robotId,
         img: src,
-        owidth: width,
-        oheight: height,
+        oWidth: width,
+        oHeight: height,
         left: left,
         top: top,
         domHeight: domHeight,
@@ -31,7 +30,7 @@ module.exports = (state = immutable.fromJS(robot), action) => {
       return state.update('robotContainer', container => {
         const getRobot = action.data.map(item => {
           return {
-            robotid: item.robotid,
+            robotId: item.robotId,
             info: item
           }
         });

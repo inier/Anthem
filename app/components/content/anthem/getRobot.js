@@ -28,7 +28,7 @@ const renderRobot = state => {
         robotList = robotList ? robotList.concat(locationInfo) : locationInfo;
     });
 
-    return robotList.map(robot => (<Robot key={robot.robotid} info={robot}/>));
+    return robotList.map(robot => (<Robot key={robot.robotId} info={robot}/>));
 }
 
 export default renderRobot;
