@@ -19,7 +19,7 @@ export const arrangeProperties = {
   //left 值
   locationLeft: null,
   //请求图片数量
-  requestImgNum:100
+  requestImgNum:20
 }
 
 /**

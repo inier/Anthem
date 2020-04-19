@@ -115,7 +115,7 @@ class Anthem extends BaseCom {
     let { positioningNum } = this.state;
 
     // 定位与列数一致时 换行
-    if (positioningNum == maxColumns) {
+    if (positioningNum === maxColumns) {
       this.setState({
         positioningNum: 0,
       });
@@ -126,24 +126,25 @@ class Anthem extends BaseCom {
       Math.min.apply(Math, robotTopLocation)
     );
     // 图片原始宽度
-    const imgWidth = element.width;
+    const imgWidth = element.width || 0;
     // 计算出图片在进入dom后的高度
-    const imgHeight = (columnsWidth / imgWidth) * element.height;
+    const imgHeight = Math.floor((columnsWidth / imgWidth) * (element.height || 0));
     // dom高
     element.domHeight = imgHeight;
     // dom宽
     element.domWidth = columnsWidth;
     // 位列一行中第几位
     element.columnsNum = minTopNum;
+    const topNum = robotTopLocation[minTopNum];
+
     // 获取top值
-    element.top = robotTopLocation[minTopNum];
+    element.top = topNum;
     // 获取left值
     element.left = locationLeft[minTopNum];
 
     // 设定下一个同列图片的top
     setTop(minTopNum, imgHeight);
-
-    const topNum = robotTopLocation[minTopNum];
+    
     upContainerHeight(topNum);
 
     // 获取所放置的屏幕号 下标
@@ -156,7 +157,7 @@ class Anthem extends BaseCom {
       positioningNum: positioningNum++,
     });
 
-    // top大于当前屏幕高度 则增加屏幕
+    // top大于当前view高度 则增加屏幕
     if (element.top > viewHeight * screenAllNum) {
       // 超出高度 则不管了
       return "beyond";
