@@ -14,6 +14,7 @@ const Container = styled.div`
   position: relative;
   flex: 1;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 `;
 
 // 获取随机id
