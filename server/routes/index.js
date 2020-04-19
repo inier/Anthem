@@ -15,9 +15,8 @@ const numGetImgList = (imgList, newList, userGetNum) => {
     : numGetImgList(imgList, newList, userGetNum);
   //获取图片宽高
   let dimensions = sizeOf(path.join(__dirname, "..", "public", newImg));
-
   newList.push({
-    src: newImg,
+    src: `${newImg}?w=${dimensions.width}&h=${dimensions.height}`,
     width: dimensions.width,
     height: dimensions.height,
   });
