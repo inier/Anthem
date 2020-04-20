@@ -4,6 +4,8 @@ import BaseCom from './BaseComponent';
 import Title from './titile/index';
 import Content from './content/index';
 import { hot } from 'react-hot-loader/root';
+import TheMasonry from "./TheMasonry";
+
 const ContainerApp = styled.div `
     max-width: 1024px;
     display: flex;
@@ -14,6 +16,7 @@ const ContainerApp = styled.div `
 
 class App extends BaseCom {
   render() {
+    return <TheMasonry />;
     return (
       <ContainerApp>
         <Title/>
@@ -22,5 +25,6 @@ class App extends BaseCom {
     );
   }
 }
+
 
 export default hot(App);

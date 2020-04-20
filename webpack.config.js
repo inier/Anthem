@@ -26,10 +26,15 @@ module.exports = {
       warnings: true,
     },
     // noInfo: false,
-    // quiet: false,
+    // quiet: false,    
+    watchOptions: {
+      ignored: /node_modules/, //忽略不用监听变更的目录
+      aggregateTimeout: 500, //防止重复保存频繁重新编译,500毫米内重复保存不打包
+      poll: 1000, //每秒询问的文件变更的次数
+    },
   },
   mode: "development",
-  devtool: true,
+  devtool: "cheap-module-eval-source-map",
   entry: [
     // patch 要放在 vendor 最前面
     "react-hot-loader/patch",
@@ -46,8 +51,31 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        // include: path.resolve(__dirname, 'app'),
-        loader: "style-loader!css-loader",
+        use: ["style-loader", "css-loader", "postcss-loader"],
+        // include: path.join(__dirname, "app"),
+        // exclude: /node_modules/,
+      },
+      {
+        test: new RegExp(`^(?!.*\\.module).*\\.scss`),
+        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
+        // include: path.join(__dirname, "app"),
+        // exclude: /node_modules/,
+      },
+      {
+        test: new RegExp(`^(.*\\.module).*\\.scss`),
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              modules: true,
+            },
+          },
+          "postcss-loader",
+          "sass-loader",
+        ],
+        // include: path.join(__dirname, "app"),
+        // exclude: /node_modules/,
       },
       {
         test: /\.js[x]?$/,
