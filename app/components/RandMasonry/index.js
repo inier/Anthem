@@ -2,8 +2,35 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import Masonry, { dataTransfer } from "@ozo/masonry";
 import { RadioList } from "@ozo/radio";
-import axios from "axios";
-import serverConf from "@/serverConf.js";
+
+// 生成[n,m]范围内的随机整数
+const getRandomByRange = (n, m, randArr) => {
+  function random() {
+    const number1 = Math.random() * (m - n + 1);
+    const number2 = Math.floor(number1);
+
+    return number2 + n;
+  }
+
+  let rand = random();
+
+  const tFlag = randArr.filter((item) => {
+    if (item === rand) {
+      return false;
+    }
+    if (item > rand + 20 || item < rand - 20) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  while (tFlag.length > 1) {
+    rand = random();
+  }
+
+  return rand;
+};
 
 // 列数
 const cols = 2;
@@ -18,8 +45,40 @@ const maxHeight = 500;
 
 // 请求总数
 const reqCount = 50;
+// 请求图片最小高度
+const reqMinHeight = 200;
+// 请求图片最大高度
+const reqMaxHeight = maxHeight;
+// 请求图片宽度
+const reqWidth = Math.ceil(contentWidth / cols);
 // 提前加载偏移（相对于图片容器顶部）
 const lazyLoadOffset = 0;
+
+const getElements = (args = {}) => {
+  const tDefault = {
+    num: reqCount,
+    minHeight: reqMinHeight,
+    maxHeight: reqMaxHeight,
+    start: 0,
+    ...args,
+  };
+  const { num, minHeight, maxHeight, start } = tDefault;
+  const result = [];
+  const reqHeights = [];
+
+  for (let i = 0; i < num; i++) {
+    const reqHeight = getRandomByRange(minHeight, maxHeight, reqHeights);
+
+    result.push({
+      id: `m-${i + 1 + start}`,
+      src: `https://i.picsum.photos/id/${i + 1}/${reqWidth}/${reqHeight}.jpg`,
+      // src: `https://picsum.photos/${reqWidth}/${reqHeight}?image=${i + 1}`,
+      title: `[${i + 1 + start}] ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
+    });
+  }
+
+  return result;
+};
 
 const DemoShow = styled.div`
   position: relative;
@@ -127,39 +186,13 @@ class App extends Component {
       data: [],
       close: true,
     };
-    this.data = [];
+    this.data = this.data = getElements();
     this.screenIndex = 1;
   }
   componentDidMount() {
     console.log("1:");
-
-    this.getNewImgData(reqCount).then((res) => {
-      this.data = res;
-      this.calcData(this.data);
-    });
+    this.calcData(this.data);
   }
-  // 获取图片
-  getNewImgData = (requestImgNum) => {
-    return axios
-      .get(`http://${window.location.hostname}:${serverConf.imgServer.port}/`, {
-        params: {
-          num: requestImgNum,
-        },
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          return res.data.map((item) => {
-            const { src, ...rest } = item;
-            return {
-              src: `http://${window.location.hostname}:${serverConf.imgServer.port}/${item.src}`,
-              ...rest,
-            };
-          });
-        } else {
-          alert("请求失败！");
-        }
-      });
-  };
   calcData = (arr) => {
     const { cols, gutter, maxHeight } = this.state;
     const tStartTime = performance.now();
@@ -168,7 +201,7 @@ class App extends Component {
       contentWidth,
       maxHeight,
     }).then((data) => {
-      console.log(`本次数据转换耗时：`,performance.now() - tStartTime) 
+      console.log(`本次数据转换耗时：`, performance.now() - tStartTime);
       this.setState({ data });
     });
   };
@@ -181,11 +214,9 @@ class App extends Component {
     if (Math.floor(scrollTop / tHeight) >= this.screenIndex) {
       this.screenIndex++;
       console.log("> 1:", scrollTop, tHeight);
-      this.getNewImgData(20).then((res) => {
-        const tArr = this.data.concat(res);
-        this.calcData(tArr);
-        this.data = tArr;
-      });
+      const tArr = this.data.concat(getElements({ num: 20, start: reqCount }));
+      this.calcData(tArr);
+      this.data = tArr;
     }
   };
   handleRadioChange = (value) => {
@@ -258,6 +289,7 @@ class App extends Component {
           </Tabs>
           <Container>
             <Masonry
+              key="1"
               renderType={renderType}
               data={data}
               cols={cols}
