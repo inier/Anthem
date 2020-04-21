@@ -7,7 +7,7 @@ import getRobot from './getRobot';
  * @param {*} ownProps
  */
 const stateSetProp = (state, ownProps) => {
-  return {
+  const tState = {
     //列数
     maxColumns: state.getIn(['arrangeProperties', 'maxColumns']),
     //列宽
@@ -35,6 +35,9 @@ const stateSetProp = (state, ownProps) => {
     //机器人父级容器高度
     containerHeight: state.getIn(['arrangeProperties', 'containerHeight'])
   };
+
+  console.log("tState:", tState);
+  return tState;
 }
 
 /**

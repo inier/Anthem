@@ -36,23 +36,24 @@ const getRandomByRange = (n, m, randArr) => {
 const cols = 2;
 // 槽宽，横向、纵向一致
 const gutter = 10;
-// 扩展内容高度
+// 瀑布流容器高宽
+const viewWidth = Math.min(window.screen.width, 414) - 24;
+const viewHeight = Math.min(window.screen.width, 736) - 45;
+// 子项的扩展内容高度
 const addHeight = 32;
-// 内容宽度（版芯宽度）
-const contentWidth = Math.min(window.screen.width, 414) - 24;
 // 子项最大高度（包括addHeight）
 const maxHeight = 500;
+// 提前加载偏移（相对于图片容器顶部）
+const lazyLoadOffset = 0;
 
 // 请求总数
 const reqCount = 50;
+// 请求图片宽度
+const reqWidth = Math.ceil(viewWidth / cols);
 // 请求图片最小高度
 const reqMinHeight = 200;
 // 请求图片最大高度
 const reqMaxHeight = maxHeight;
-// 请求图片宽度
-const reqWidth = Math.ceil(contentWidth / cols);
-// 提前加载偏移（相对于图片容器顶部）
-const lazyLoadOffset = 0;
 
 const getElements = (args = {}) => {
   const tDefault = {
@@ -178,15 +179,15 @@ class App extends Component {
     super(props);
 
     this.state = {
-      lazyLoadOffset,
-      maxHeight,
-      renderType: "position",
+      data: [],
       cols,
       gutter,
-      data: [],
+      renderType: "position",
+      lazyLoadOffset,
+      maxHeight,
       close: true,
     };
-    this.data = this.data = getElements();
+    this.data = getElements();
     this.screenIndex = 1;
   }
   componentDidMount() {
@@ -197,8 +198,9 @@ class App extends Component {
     const { cols, gutter, maxHeight } = this.state;
     const tStartTime = performance.now();
     dataTransfer(arr, cols, gutter, {
+      viewWidth,
+      viewHeight,
       addHeight,
-      contentWidth,
       maxHeight,
     }).then((data) => {
       console.log(`本次数据转换耗时：`, performance.now() - tStartTime);

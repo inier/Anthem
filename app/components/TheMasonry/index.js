@@ -9,17 +9,18 @@ import serverConf from "@/serverConf.js";
 const cols = 2;
 // 槽宽，横向、纵向一致
 const gutter = 10;
-// 扩展内容高度
+// 瀑布流容器高宽
+const viewWidth = Math.min(window.screen.width, 414) - 24;
+const viewHeight = Math.min(window.screen.width, 736) - 45;
+// 子项的扩展内容高度
 const addHeight = 32;
-// 内容宽度（版芯宽度）
-const contentWidth = Math.min(window.screen.width, 414) - 24;
 // 子项最大高度（包括addHeight）
 const maxHeight = 500;
+// 提前加载偏移（相对于图片容器顶部）
+const lazyLoadOffset = 0;
 
 // 请求总数
 const reqCount = 50;
-// 提前加载偏移（相对于图片容器顶部）
-const lazyLoadOffset = 0;
 
 const DemoShow = styled.div`
   position: relative;
@@ -119,12 +120,12 @@ class App extends Component {
     super(props);
 
     this.state = {
-      lazyLoadOffset,
-      maxHeight,
-      renderType: "position",
+      data: [],
       cols,
       gutter,
-      data: [],
+      renderType: "position",
+      lazyLoadOffset,
+      maxHeight,
       close: true,
     };
     this.data = [];
@@ -164,11 +165,12 @@ class App extends Component {
     const { cols, gutter, maxHeight } = this.state;
     const tStartTime = performance.now();
     dataTransfer(arr, cols, gutter, {
+      viewWidth,
+      viewHeight,
       addHeight,
-      contentWidth,
       maxHeight,
     }).then((data) => {
-      console.log(`本次数据转换耗时：`,performance.now() - tStartTime) 
+      console.log(`本次数据转换耗时：`, performance.now() - tStartTime);
       this.setState({ data });
     });
   };
