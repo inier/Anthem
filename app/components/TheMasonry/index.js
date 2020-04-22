@@ -164,7 +164,9 @@ class App extends Component {
   calcData = (arr) => {
     const { cols, gutter, maxHeight } = this.state;
     const tStartTime = performance.now();
-    dataTransfer(arr, cols, gutter, {
+    dataTransfer(arr, {
+      cols,
+      gutter,
       viewWidth,
       viewHeight,
       addHeight,
