@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.9.2",
-    "@ozo/masonry": "^1.0.6",
+    "@ozo/masonry": "^1.0.11",
     "@ozo/radio": "^1.0.1",
     "axios": "^0.19.2",
     "immutable": "^3.8.2",

@@ -11,7 +11,7 @@ const cols = 2;
 const gutter = 10;
 // 瀑布流容器高宽
 const viewWidth = Math.min(window.screen.width, 414) - 24;
-const viewHeight = Math.min(window.screen.width, 736) - 45;
+const viewHeight = Math.min(window.screen.height, 736) - 45;
 // 子项的扩展内容高度
 const addHeight = 32;
 // 子项最大高度（包括addHeight）
@@ -20,13 +20,16 @@ const maxHeight = 500;
 const lazyLoadOffset = 0;
 
 // 请求总数
-const reqCount = 50;
+const reqCount = 500;
 
 const DemoShow = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 320px;
+  max-width: ${Math.min(window.screen.width, 414)}px;
+  max-height: ${Math.min(window.screen.height, 736)}px;
   [role="radiogroup"] label {
     margin-bottom: 5px;
   }
@@ -34,10 +37,6 @@ const DemoShow = styled.div`
 const Demo = styled.div`
   position: relative;
   height: 100vh;
-  // overflow: hidden;
-  min-width: 320px;
-  max-width: ${window.screen.width};
-  max-height: 736px;
   display: flex;
   flex-direction: column;
   background-color: #f1f1f1;
@@ -54,13 +53,13 @@ const Container = styled.div`
   flex: 1;
   display: flex;
   height: 100%;
-  padding: 0 12px;
 `;
 const Tools = styled.div`
   width: 42%;
   position: absolute;
   right: 0;
   bottom: 70px;
+  z-index: 999999;
   display: flex;
   flex-direction: column;
   padding: 20px 10px;
@@ -80,6 +79,7 @@ const Handler = styled.div`
   position: absolute;
   bottom: 20px;
   right: 0;
+  z-index: 999998;
   width: 50px;
   height: 50px;
   border-radius: 100%;
@@ -120,7 +120,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      data: [],
+      data: {},
       cols,
       gutter,
       renderType: "position",
@@ -132,15 +132,14 @@ class App extends Component {
     this.screenIndex = 1;
   }
   componentDidMount() {
-    console.log("1:");
-
+    console.log("初始化:");
     this.getNewImgData(reqCount).then((res) => {
       this.data = res;
       this.calcData(this.data);
     });
   }
   // 获取图片
-  getNewImgData = (requestImgNum) => {
+  getNewImgData = (requestImgNum, start = 0) => {
     return axios
       .get(`http://${window.location.hostname}:${serverConf.imgServer.port}/`, {
         params: {
@@ -149,9 +148,13 @@ class App extends Component {
       })
       .then((res) => {
         if (res.status === 200) {
-          return res.data.map((item) => {
+          return res.data.map((item, index) => {
             const { src, ...rest } = item;
             return {
+              id: `m-${index + 1 + start}`,
+              title: `[${
+                index + 1 + start
+              }] 我是标题我是标题我是标题我是标题我是标题`,
               src: `http://${window.location.hostname}:${serverConf.imgServer.port}/${item.src}`,
               ...rest,
             };
@@ -161,8 +164,8 @@ class App extends Component {
         }
       });
   };
-  calcData = (arr) => {
-    const { cols, gutter, maxHeight } = this.state;
+  calcData = (arr, isForce = false) => {
+    const { cols, gutter, renderType, maxHeight } = this.state;
     const tStartTime = performance.now();
     dataTransfer(arr, {
       cols,
@@ -171,7 +174,10 @@ class App extends Component {
       viewHeight,
       addHeight,
       maxHeight,
+      renderType,
+      force: isForce,
     }).then((data) => {
+      console.log(data);
       console.log(`本次数据转换耗时：`, performance.now() - tStartTime);
       this.setState({ data });
     });
@@ -179,41 +185,51 @@ class App extends Component {
   handleClick = (id, item, e) => {
     console.log(id, item, e);
   };
-  handleScroll = (scrollTop, e) => {
+  handleScroll = (e, scrollTop, screenCount) => {
     const tHeight = e.currentTarget.clientHeight;
+    const screenIndex = Math.floor(scrollTop / tHeight);
 
-    if (Math.floor(scrollTop / tHeight) >= this.screenIndex) {
-      this.screenIndex++;
-      console.log("> 1:", scrollTop, tHeight);
-      this.getNewImgData(20).then((res) => {
-        const tArr = this.data.concat(res);
-        this.calcData(tArr);
-        this.data = tArr;
-      });
+    if (screenIndex >= this.screenIndex) {
+      setTimeout(() => {
+        this.screenIndex++;
+        console.log("> 1:", scrollTop, tHeight);
+        this.getNewImgData(20, this.data.length).then((res) => {
+          const tArr = this.data.concat(res);
+          this.calcData(tArr);
+          this.data = tArr;
+        });
+      }, 2000);
     }
   };
   handleRadioChange = (value) => {
-    this.setState({
-      renderType: value,
-    });
-  };
-  handleColChange = (e) => {
     this.setState(
       {
-        cols: Number(e.currentTarget.value),
+        renderType: value,
       },
       () => {
-        this.calcData(this.data);
+        this.calcData(this.data, true);
+      }
+    );
+  };
+  handleColChange = (e) => {
+    const tValue = Number(e.currentTarget.value);
+    this.setState(
+      {
+        cols: tValue,
+      },
+      () => {
+        this.calcData(this.data, tValue !== this.state.cols);
       }
     );
   };
   handleGutterChange = (e) => {
+    const tValue = Number(e.currentTarget.value);
     this.setState(
       {
-        gutter: Number(e.currentTarget.value),
+        gutter: tValue,
       },
       () => {
-        this.calcData(this.data);
+        this.calcData(this.data, tValue !== this.state.gutter);
       }
     );
   };
@@ -234,7 +250,7 @@ class App extends Component {
     });
   };
   handleSwitch = (e) => {
-    e.currentTarget.setAttribute("data-tag", this.state.close ? "-" : "+");
+    e.currentTarget.setAttribute("data-tag", this.state.close ? "+" : "-");
     this.setState({
       close: !this.state.close,
     });
@@ -253,15 +269,10 @@ class App extends Component {
     return (
       <DemoShow>
         <Demo>
-          <Tabs>
-            Tabs(
-            {data.reduce((r, v) => {
-              return r + v.length;
-            }, 0)}
-            )
-          </Tabs>
+          <Tabs>Tabs({data.total})</Tabs>
           <Container>
             <Masonry
+              virtualized
               renderType={renderType}
               data={data}
               cols={cols}

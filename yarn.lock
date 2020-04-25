@@ -1092,10 +1092,10 @@
     "@fortawesome/react-fontawesome" "^0.1.9"
     prop-types "^15.5.8"
 
-"@ozo/masonry@^1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@ozo/masonry/-/masonry-1.0.6.tgz#f74aea3458d9723d98918a2157d3253018242bc6"
-  integrity sha512-66N+vgzfI0MKH3FTP4O62D3AFUEwNpB71HyagPrhhKQR0ExZ2gsTnSkDWyDMLQdQ6WLugmFqWbXQd2IY5101JQ==
+"@ozo/masonry@^1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@ozo/masonry/-/masonry-1.0.11.tgz#93febb7907225d94805c1f84be2408c8c879aee4"
+  integrity sha512-JjrEA5WAmOzwXAN1fyZLquuiMYQ2CuXqzO4dfHixtA0W9Bc65Rok7YgaDE3gPzvMVXGjSLU8Ut5KJxWnysBJFA==
   dependencies:
     prop-types "^15.7.2"
     react-lazyload "^2.6.7"

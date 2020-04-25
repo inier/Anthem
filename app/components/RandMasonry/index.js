@@ -38,7 +38,7 @@ const cols = 2;
 const gutter = 10;
 // 瀑布流容器高宽
 const viewWidth = Math.min(window.screen.width, 414) - 24;
-const viewHeight = Math.min(window.screen.width, 736) - 45;
+const viewHeight = Math.min(window.screen.height, 736) - 45;
 // 子项的扩展内容高度
 const addHeight = 32;
 // 子项最大高度（包括addHeight）
@@ -74,7 +74,7 @@ const getElements = (args = {}) => {
       id: `m-${i + 1 + start}`,
       src: `https://i.picsum.photos/id/${i + 1}/${reqWidth}/${reqHeight}.jpg`,
       // src: `https://picsum.photos/${reqWidth}/${reqHeight}?image=${i + 1}`,
-      title: `[${i + 1 + start}] ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
+      title: `[${i + 1 + start}] 我是标题我是标题我是标题我是标题我是标题`,
     });
   }
 
@@ -86,6 +86,10 @@ const DemoShow = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 320px;
+  max-width: ${Math.min(window.screen.width, 414)}px;
+  max-height: ${Math.min(window.screen.height, 736)}px;
+
   [role="radiogroup"] label {
     margin-bottom: 5px;
   }
@@ -93,10 +97,6 @@ const DemoShow = styled.div`
 const Demo = styled.div`
   position: relative;
   height: 100vh;
-  // overflow: hidden;
-  min-width: 320px;
-  max-width: ${window.screen.width};
-  max-height: 736px;
   display: flex;
   flex-direction: column;
   background-color: #f1f1f1;
@@ -113,13 +113,13 @@ const Container = styled.div`
   flex: 1;
   display: flex;
   height: 100%;
-  padding: 0 12px;
 `;
 const Tools = styled.div`
   width: 42%;
   position: absolute;
   right: 0;
   bottom: 70px;
+  z-index: 999999;
   display: flex;
   flex-direction: column;
   padding: 20px 10px;
@@ -139,6 +139,7 @@ const Handler = styled.div`
   position: absolute;
   bottom: 20px;
   right: 0;
+  z-index: 999998;
   width: 50px;
   height: 50px;
   border-radius: 100%;
@@ -179,7 +180,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      data: [],
+      data: {},
       cols,
       gutter,
       renderType: "position",
@@ -191,11 +192,11 @@ class App extends Component {
     this.screenIndex = 1;
   }
   componentDidMount() {
-    console.log("1:");
+    console.log("初始化:");
     this.calcData(this.data);
   }
-  calcData = (arr) => {
-    const { cols, gutter, maxHeight } = this.state;
+  calcData = (arr, isForce = false) => {
+    const { cols, gutter, renderType, maxHeight } = this.state;
     const tStartTime = performance.now();
     dataTransfer(arr, {
       cols,
@@ -204,7 +205,10 @@ class App extends Component {
       viewHeight,
       addHeight,
       maxHeight,
+      renderType,
+      force: isForce,
     }).then((data) => {
+      console.log(data);
       console.log(`本次数据转换耗时：`, performance.now() - tStartTime);
       this.setState({ data });
     });
@@ -212,39 +216,51 @@ class App extends Component {
   handleClick = (id, item, e) => {
     console.log(id, item, e);
   };
-  handleScroll = (scrollTop, e) => {
+  handleScroll = (e, scrollTop, screenCount) => {
     const tHeight = e.currentTarget.clientHeight;
+    const screenIndex = Math.floor(scrollTop / tHeight);
 
-    if (Math.floor(scrollTop / tHeight) >= this.screenIndex) {
-      this.screenIndex++;
-      console.log("> 1:", scrollTop, tHeight);
-      const tArr = this.data.concat(getElements({ num: 20, start: reqCount }));
-      this.calcData(tArr);
-      this.data = tArr;
+    if (screenIndex >= this.screenIndex) {
+      setTimeout(() => {
+        this.screenIndex++;
+        console.log("> 1:", scrollTop, tHeight);
+        const tArr = this.data.concat(
+          getElements({ num: 20, start: this.data.length })
+        );
+        this.calcData(tArr);
+        this.data = tArr;
+      }, 2000);
     }
   };
   handleRadioChange = (value) => {
-    this.setState({
-      renderType: value,
-    });
-  };
-  handleColChange = (e) => {
     this.setState(
       {
-        cols: Number(e.currentTarget.value),
+        renderType: value,
       },
       () => {
-        this.calcData(this.data);
+        this.calcData(this.data, true);
+      }
+    );
+  };
+  handleColChange = (e) => {
+    const tValue = Number(e.currentTarget.value);
+    this.setState(
+      {
+        cols: tValue,
+      },
+      () => {
+        this.calcData(this.data, tValue !== this.state.cols);
       }
     );
   };
   handleGutterChange = (e) => {
+    const tValue = Number(e.currentTarget.value);
     this.setState(
       {
-        gutter: Number(e.currentTarget.value),
+        gutter: tValue,
       },
       () => {
-        this.calcData(this.data);
+        this.calcData(this.data, tValue !== this.state.gutter);
       }
     );
   };
@@ -265,7 +281,7 @@ class App extends Component {
     });
   };
   handleSwitch = (e) => {
-    e.currentTarget.setAttribute("data-tag", this.state.close ? "-" : "+");
+    e.currentTarget.setAttribute("data-tag", this.state.close ? "+" : "-");
     this.setState({
       close: !this.state.close,
     });
@@ -280,20 +296,13 @@ class App extends Component {
       lazyLoadOffset,
       close,
     } = this.state;
-
     return (
       <DemoShow>
         <Demo>
-          <Tabs>
-            Tabs(
-            {data.reduce((r, v) => {
-              return r + v.length;
-            }, 0)}
-            )
-          </Tabs>
+          <Tabs>Tabs({data.total})</Tabs>
           <Container>
             <Masonry
-              key="1"
+              virtualized
               renderType={renderType}
               data={data}
               cols={cols}
@@ -304,7 +313,7 @@ class App extends Component {
             />
           </Container>
         </Demo>
-        <Handler data-tag="+" onClick={this.handleSwitch} />
+        <Handler data-tag="-" onClick={this.handleSwitch} />
         <Tools className={close ? "close" : ""}>
           <ToolsItem>
             <ToolsTitle>cols: {cols}</ToolsTitle>
